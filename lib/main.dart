@@ -66,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _delay = 'null';
   String _modeIdentifier = '';
   String _error = '';
+  List<String> _allStops = [];
 
   String formatDateTime(String dateTimeString) {
     tz.initializeTimeZones();
@@ -84,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _mode = '';
       _delay = 'null';
       _modeIdentifier = '';
+      _error = '';
     });
   }
 
@@ -107,6 +109,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _error = '';
         final connection = responseData['stationboard'][randomNumber];
 
+        // iterate thourgh connection['passList'] and add all stops to _allStops
+        for (var stop in connection['passList']) {
+          var name = stop['station']['name'];
+          if (name == null) {
+            _allStops.add(_station);
+          } else {
+            _allStops.add(name);
+          }
+        }
         setState(() {
           if (connection['stop']['platform'] != null) {
             _track = connection['stop']['platform'];
@@ -134,6 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
           departureTime: _departureTime,
           delay: _delay,
           track: _track,
+          stops: _allStops,
         ),
       ),
     );
@@ -257,7 +269,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
         responseData
             .removeWhere((item) => item["iconclass"] == "sl-icon-type-adr");
         var possibleStations =
-            responseData.sublist(0, min<int>(5, responseData.length));
+            responseData.sublist(0, min<int>(10, responseData.length));
 
         setState(() {
           _possibleStations = possibleStations;
@@ -350,22 +362,40 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 }
 
-class StopsPage extends StatelessWidget {
+class StopsPage extends StatefulWidget {
   final String mode;
   final String modeIdentifier;
   final String destination;
   final String departureTime;
   final String delay;
   final String track;
+  final List<String> stops;
 
-  StopsPage({
+  const StopsPage({
     required this.mode,
     required this.modeIdentifier,
     required this.destination,
     required this.departureTime,
     required this.delay,
     required this.track,
+    required this.stops,
   });
+
+  @override
+  State<StopsPage> createState() => _StopsPageState();
+}
+
+class _StopsPageState extends State<StopsPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  List<bool> highlightedStops = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the highlightedStops list with false values
+    highlightedStops = List.generate(widget.stops.length, (index) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -382,13 +412,51 @@ class StopsPage extends StatelessWidget {
             const SizedBox(height: 30),
             // Include the BuildConnectionDetails widget to show connection details
             _BuildConnectionDetails(
-              mode: mode,
-              modeIdentifier: modeIdentifier,
-              destination: destination,
-              departureTime: departureTime,
-              delay: delay,
-              track: track,
+              mode: widget.mode,
+              modeIdentifier: widget.modeIdentifier,
+              destination: widget.destination,
+              departureTime: widget.departureTime,
+              delay: widget.delay,
+              track: widget.track,
             ),
+            // Add a scrollable list of stops
+            Expanded(
+              child: ListView.builder(
+                controller:
+                    _scrollController, // Assign the ScrollController to the ListView
+                itemCount: widget.stops.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(
+                      widget.stops[index],
+                      style: TextStyle(
+                        color:
+                            highlightedStops[index] ? Colors.red : Colors.black,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Add a button
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                int randomIndex = 1 + Random().nextInt(widget.stops.length - 1);
+                setState(() {
+                  // Set the selected stop as highlighted and scroll it into view
+                  highlightedStops = List.generate(
+                      widget.stops.length, (index) => index == randomIndex);
+                  _scrollController.animateTo(
+                    randomIndex * 56.0, // 56.0 is the height of each ListTile
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                });
+              },
+              child: const Text('Zufälliger Halt'),
+            ),
+            const SizedBox(height: 30)
           ],
         ),
       ),
@@ -404,7 +472,7 @@ class _BuildConnectionDetails extends StatelessWidget {
   final String delay;
   final String track;
 
-  _BuildConnectionDetails({
+  const _BuildConnectionDetails({
     required this.mode,
     required this.modeIdentifier,
     required this.destination,
