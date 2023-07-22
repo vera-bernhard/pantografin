@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _mode = '';
   String _delay = '';
   String _modeIdentifier = '';
+  String _error = '';
 
   String formatDateTime(String dateTimeString) {
     // Load the time zone data
@@ -91,18 +92,28 @@ class _MyHomePageState extends State<MyHomePage> {
     var randomNumber = random.nextInt(limit);
 
     if (response.statusCode == 200) {
-      // API request was successful
       final responseData = jsonDecode(response.body);
 
-      final connection = responseData['stationboard'][randomNumber];
-      setState(() {
-        _track = connection['stop']['platform'];
-        _departureTime = formatDateTime(connection['stop']['departure']);
-        _delay = connection['stop']['delay'].toString();
-        _destination = connection['to'];
-        _mode = connection['category'];
-        _modeIdentifier = _mode + connection['number'];
-      });
+      if (responseData['station']['name'] == null) {
+        setState(() {
+          _error = 'Bahnhof/Haltestelle nicht gefunden';
+        });
+      } else {
+        // API request was successful
+
+        final connection = responseData['stationboard'][randomNumber];
+
+        setState(() {
+          if (connection['stop']['platform'] != null) {
+            _track = connection['stop']['platform'];
+          }
+          _departureTime = formatDateTime(connection['stop']['departure']);
+          _delay = connection['stop']['delay'].toString();
+          _destination = connection['to'];
+          _mode = connection['category'];
+          _modeIdentifier = _mode + connection['number'];
+        });
+      }
     } else {
       // API request failed
       // You can handle errors here, e.g., show a snackbar or error message
@@ -136,21 +147,68 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Zufällige Verbindung'),
             ),
             const SizedBox(height: 30),
-            Row(children: [
-              if (_departureTime != '') ...[
+            if (_error != '') ...[
+              Text(_error,
+                  style: const TextStyle(
+                    fontSize: 18.0, // Set the font size to 24
+                    fontWeight: FontWeight.bold, // Set the font weight to bold
+                    color: Colors.red,
+                  ))
+            ],
+            if (_departureTime != '') ...[
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 // conditional icon depending on mode
                 Icon(
                   modeIcons[_mode],
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                Text('Track: $_track'),
-                Text('Departure Time: $_departureTime'),
-                Text('Destination: $_destination'),
-                Text('Mode: $_mode'),
-                Text('Delay: $_delay'),
-                Text('Mode Identifier: $_modeIdentifier'),
-              ],
-            ])
+                const SizedBox(width: 5),
+                Text('$_modeIdentifier',
+                    style: const TextStyle(
+                      fontSize: 18.0, // Set the font size to 24
+                      fontWeight:
+                          FontWeight.bold, // Set the font weight to bold
+                    )),
+                const SizedBox(width: 10),
+                Text('Richtung $_destination',
+                    style: const TextStyle(
+                      fontSize: 18.0, // Set the font size to 24
+                      fontWeight:
+                          FontWeight.bold, // Set the font weight to bold
+                    )),
+              ])
+            ],
+            if (_departureTime != '') ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Abfahrt um $_departureTime',
+                      style: const TextStyle(
+                        fontSize: 18.0, // Set the font size to 24
+                        fontWeight:
+                            FontWeight.bold, // Set the font weight to bold
+                      )),
+                  if (_delay != '0') ...[
+                    Text('+$_delay',
+                        style: const TextStyle(
+                          fontSize: 12.0, // Set the font size to 24
+                          fontWeight:
+                              FontWeight.bold, // Set the font weight to bold
+                          color: Colors.red,
+                        )),
+                  ],
+                  SizedBox(width: 5),
+                  if (_track != '') ...[
+                    Text('auf Gleis $_track',
+                        style: const TextStyle(
+                          fontSize: 18.0, // Set the font size to 24
+                          fontWeight:
+                              FontWeight.bold, // Set the font weight to bold
+                        )),
+                  ],
+                ],
+              )
+            ]
           ],
         ),
       ),
