@@ -86,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _delay = 'null';
       _modeIdentifier = '';
       _error = '';
+      _allStops = [];
     });
   }
 
@@ -107,27 +108,42 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         _error = '';
-        final connection = responseData['stationboard'][randomNumber];
 
-        // iterate thourgh connection['passList'] and add all stops to _allStops
-        for (var stop in connection['passList']) {
-          var name = stop['station']['name'];
-          if (name == null) {
-            _allStops.add(_station);
-          } else {
-            _allStops.add(name);
-          }
-        }
-        setState(() {
-          if (connection['stop']['platform'] != null) {
-            _track = connection['stop']['platform'];
-          }
-          _departureTime = formatDateTime(connection['stop']['departure']);
-          _delay = connection['stop']['delay'].toString();
-          _destination = connection['to'];
-          _mode = connection['category'];
-          _modeIdentifier = _mode + connection['number'];
+        // limit connections to only those in the next 30 minutes
+        var connections = responseData['stationboard'];
+        connections.removeWhere((connection) {
+          var departure = DateTime.parse(connection['stop']['departure']);
+          var now = DateTime.now();
+          return departure.difference(now).inMinutes > 30;
         });
+        if (connections.isEmpty) {
+          setState(() {
+            _error = 'Keine Verbindungen in den nächsten 30 Minuten';
+          });
+          return;
+        } else {
+          final connection = responseData['stationboard'][randomNumber];
+
+          // iterate thourgh connection['passList'] and add all stops to _allStops
+          for (var stop in connection['passList']) {
+            var name = stop['station']['name'];
+            if (name == null) {
+              _allStops.add(_station);
+            } else {
+              _allStops.add(name);
+            }
+          }
+          setState(() {
+            if (connection['stop']['platform'] != null) {
+              _track = connection['stop']['platform'];
+            }
+            _departureTime = formatDateTime(connection['stop']['departure']);
+            _delay = connection['stop']['delay'].toString();
+            _destination = connection['to'];
+            _mode = connection['category'];
+            _modeIdentifier = _mode + connection['number'];
+          });
+        }
       }
     } else {
       print('API request failed with status code: ${response.statusCode}');
@@ -525,7 +541,7 @@ class _BuildConnectionDetails extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (delay != 'null') ...[
+            if (delay != 'null' && delay != '0') ...[
               Text(
                 '+$delay',
                 style: const TextStyle(
