@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert'; // Import the dart:convert library
 import 'dart:math';
 import 'package:intl/intl.dart'; // Import the intl library
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   runApp(const MyApp());
@@ -45,10 +47,36 @@ class _MyHomePageState extends State<MyHomePage> {
   String _modeIdentifier = '';
 
   String formatDateTime(String dateTimeString) {
+    // Load the time zone data
+    tz.initializeTimeZones();
+
+    // Parse the input date string into a DateTime object
     DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedTime = DateFormat('HH:mm').format(dateTime);
+
+    // Get the time zone for GMT+2 (Central European Time, CET)
+    tz.Location gmtPlus2 = tz.getLocation('Europe/Paris');
+
+    // Convert the input DateTime to GMT+2
+    tz.TZDateTime gmtPlus2DateTime = tz.TZDateTime.from(dateTime, gmtPlus2);
+
+    // Format the time as HH:mm
+    String formattedTime = DateFormat('HH:mm').format(gmtPlus2DateTime);
+
     return formattedTime;
   }
+
+  // Define a map that maps each mode to its corresponding icon
+  final Map<String, IconData> modeIcons = {
+    'S': Icons.train,
+    'IR': Icons.train,
+    'IC': Icons.train,
+    'ICE': Icons.train,
+    'EC': Icons.train,
+    'B': Icons.directions_bus,
+    'T': Icons.tram,
+    'BAT': Icons.directions_boat,
+    // Add more mode-icon pairs as needed
+  };
 
   Future<void> _getRandomDeparture() async {
     // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint URL
@@ -73,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _delay = connection['stop']['delay'].toString();
         _destination = connection['to'];
         _mode = connection['category'];
-        // _modeIdentifier = _mode + connection['number'];
+        _modeIdentifier = _mode + connection['number'];
       });
     } else {
       // API request failed
@@ -108,14 +136,21 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Zufällige Verbindung'),
             ),
             const SizedBox(height: 30),
-            if (_departureTime != '') ...[
-              Text('Track: $_track'),
-              Text('Departure Time: $_departureTime'),
-              Text('Destination: $_destination'),
-              Text('Mode: $_mode'),
-              Text('Delay: $_delay'),
-              Text('Mode Identifier: $_modeIdentifier'),
-            ],
+            Row(children: [
+              if (_departureTime != '') ...[
+                // conditional icon depending on mode
+                Icon(
+                  modeIcons[_mode],
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                Text('Track: $_track'),
+                Text('Departure Time: $_departureTime'),
+                Text('Destination: $_destination'),
+                Text('Mode: $_mode'),
+                Text('Delay: $_delay'),
+                Text('Mode Identifier: $_modeIdentifier'),
+              ],
+            ])
           ],
         ),
       ),
