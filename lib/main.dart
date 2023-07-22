@@ -57,6 +57,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return formattedTime;
   }
 
+  void resetDeparture() {
+    setState(() {
+      _track = '';
+      _departureTime = '';
+      _destination = '';
+      _mode = '';
+      _delay = 'null';
+      _modeIdentifier = '';
+    });
+  }
+
   final Map<String, IconData> modeIcons = {
     'S': Icons.train,
     'SN': Icons.train,
@@ -65,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'ICE': Icons.train,
     'EC': Icons.train,
     'B': Icons.directions_bus,
-    'BNN': Icons.directions_bus,
+    'BN': Icons.directions_bus,
     'T': Icons.tram,
     'BAT': Icons.directions_boat,
     // Add more mode-icon pairs as needed
@@ -82,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-
+      resetDeparture();
       if (responseData['station']['name'] == null) {
         setState(() {
           _error = 'Bahnhof/Haltestelle nicht gefunden';
@@ -120,12 +131,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             MyCustomForm(
-              onStationChanged: (station) {
-                setState(() {
-                  _station = station;
-                });
-              },
-            ),
+                onStationChanged: (station) {
+                  setState(() {
+                    _station = station;
+                  });
+                },
+                homePageState: this),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _getRandomDeparture,
@@ -212,8 +223,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class MyCustomForm extends StatefulWidget {
   final ValueChanged<String> onStationChanged;
+  final _MyHomePageState? homePageState; // Add this line
 
-  const MyCustomForm({Key? key, required this.onStationChanged})
+  const MyCustomForm(
+      {Key? key, required this.onStationChanged, this.homePageState})
       : super(key: key);
 
   @override
@@ -221,6 +234,7 @@ class MyCustomForm extends StatefulWidget {
 }
 
 class _MyCustomFormState extends State<MyCustomForm> {
+  _MyHomePageState? _homePageState; // Add this reference
   final TextEditingController _stationController = TextEditingController();
   List<dynamic> _possibleStations = [];
 
@@ -264,7 +278,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   Future<void> _getClosestStations() async {
     String? locationString = await getCurrentLocationString();
-
     if (locationString == null) {
       return;
     } else {
@@ -282,6 +295,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
         setState(() {
           _possibleStations = possibleStations;
         });
+
+        if (widget.homePageState != null) {
+          widget.homePageState!.resetDeparture();
+        }
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
@@ -297,7 +314,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
+      width: 350,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
