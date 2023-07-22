@@ -118,6 +118,82 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  // Widget to show the connection details if available
+  Widget _buildConnectionDetails() {
+    if (_departureTime.isEmpty) {
+      return SizedBox
+          .shrink(); // Return an empty SizedBox if departureTime is empty
+    }
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              modeIcons[_mode],
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              '$_modeIdentifier',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Richtung $_destination',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Abfahrt um $_departureTime',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (_delay != 'null') ...[
+              Text(
+                '+$_delay',
+                style: const TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+            const SizedBox(width: 5),
+            if (_track.isNotEmpty) ...[
+              Text(
+                'auf Gleis $_track',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 30),
+        ElevatedButton(
+          onPressed: _getRandomDeparture,
+          child: const Text('Los gehts!'),
+        ),
+      ],
+    );
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,8 +204,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            const SizedBox(height: 30),
             MyCustomForm(
                 onStationChanged: (station) {
                   setState(() {
@@ -153,67 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-            if (_departureTime != '') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    modeIcons[_mode],
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    '$_modeIdentifier',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Richtung $_destination',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (_departureTime != '') ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Abfahrt um $_departureTime',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (_delay != 'null') ...[
-                    Text(
-                      '+$_delay',
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(width: 5),
-                  if (_track != '') ...[
-                    Text(
-                      'auf Gleis $_track',
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
+            _buildConnectionDetails(), // Call the extracted widget here
           ],
         ),
       ),
@@ -234,7 +251,6 @@ class MyCustomForm extends StatefulWidget {
 }
 
 class _MyCustomFormState extends State<MyCustomForm> {
-  _MyHomePageState? _homePageState; // Add this reference
   final TextEditingController _stationController = TextEditingController();
   List<dynamic> _possibleStations = [];
 
