@@ -65,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'ICE': Icons.train,
     'EC': Icons.train,
     'B': Icons.directions_bus,
+    'BNN': Icons.directions_bus,
     'T': Icons.tram,
     'BAT': Icons.directions_boat,
     // Add more mode-icon pairs as needed
@@ -295,7 +296,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: 300,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,6 +323,43 @@ class _MyCustomFormState extends State<MyCustomForm> {
               ),
             ],
           ),
+          const SizedBox(
+              height: 10), // Add some spacing between TextField and buttons
+          ListView.builder(
+              shrinkWrap: true,
+              itemCount: _possibleStations.length,
+              itemBuilder: (BuildContext context, int index) {
+                final stationData = _possibleStations[index];
+                final icon = stationData['iconclass'];
+                final stationName = stationData['label'];
+                final distance = stationData['dist'];
+
+                return ElevatedButton(
+                  onPressed: () {
+                    _stationController.text = stationName;
+                    widget.onStationChanged(stationName);
+                    setState(() {
+                      _possibleStations = [];
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            modeIcons[icon],
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(stationName),
+                        ],
+                      ),
+                      Text('${distance} m'),
+                    ],
+                  ),
+                );
+              }),
         ],
       ),
     );
