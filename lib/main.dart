@@ -243,15 +243,29 @@ class _MyCustomFormState extends State<MyCustomForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text('Bahnhof/Haltestelle'),
-          TextField(
-            controller: _stationController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'z.B. Zürich HB',
-            ),
-            onChanged: (String value) {
-              widget.onStationChanged(value);
-            },
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _stationController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'z.B. Zürich HB',
+                  ),
+                  onChanged: (String value) {
+                    widget.onStationChanged(value);
+                  },
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.location_on),
+                onPressed: () {
+                  // Add the action you want to perform when the button is pressed
+                  print('IconButton pressed!');
+                },
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ],
           ),
         ],
       ),
