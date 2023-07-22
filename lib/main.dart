@@ -7,6 +7,25 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:geolocator/geolocator.dart';
 
+// Define modeIcons as a global constant
+final Map<String, IconData> modeIcons = {
+  'S': Icons.train,
+  'SN': Icons.train,
+  'IR': Icons.train,
+  'IC': Icons.train,
+  'ICE': Icons.train,
+  'EC': Icons.train,
+  'B': Icons.directions_bus,
+  'BN': Icons.directions_bus,
+  'T': Icons.tram,
+  'BAT': Icons.directions_boat,
+  'sl-icon-type-strain': Icons.train,
+  'sl-icon-type-bus': Icons.directions_bus,
+  'sl-icon-type-tram': Icons.tram,
+  'sl-icon-type-ship': Icons.directions_boat,
+  // Add more mode-icon pairs as needed
+};
+
 void main() {
   runApp(const MyApp());
 }
@@ -68,20 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  final Map<String, IconData> modeIcons = {
-    'S': Icons.train,
-    'SN': Icons.train,
-    'IR': Icons.train,
-    'IC': Icons.train,
-    'ICE': Icons.train,
-    'EC': Icons.train,
-    'B': Icons.directions_bus,
-    'BN': Icons.directions_bus,
-    'T': Icons.tram,
-    'BAT': Icons.directions_boat,
-    // Add more mode-icon pairs as needed
-  };
-
   Future<void> _getRandomDeparture() async {
     const int limit = 10;
     final String api =
@@ -118,82 +123,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Widget to show the connection details if available
-  Widget _buildConnectionDetails() {
-    if (_departureTime.isEmpty) {
-      return SizedBox
-          .shrink(); // Return an empty SizedBox if departureTime is empty
-    }
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              modeIcons[_mode],
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              '$_modeIdentifier',
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Richtung $_destination',
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+  void _navigateToNewPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StopsPage(
+          mode: _mode,
+          modeIdentifier: _modeIdentifier,
+          destination: _destination,
+          departureTime: _departureTime,
+          delay: _delay,
+          track: _track,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Abfahrt um $_departureTime',
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (_delay != 'null') ...[
-              Text(
-                '+$_delay',
-                style: const TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-            const SizedBox(width: 5),
-            if (_track.isNotEmpty) ...[
-              Text(
-                'auf Gleis $_track',
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 30),
-        ElevatedButton(
-          onPressed: _getRandomDeparture,
-          child: const Text('Los gehts!'),
-        ),
-      ],
+      ),
     );
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -230,7 +175,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-            _buildConnectionDetails(), // Call the extracted widget here
+            _BuildConnectionDetails(
+              mode: _mode,
+              modeIdentifier: _modeIdentifier,
+              destination: _destination,
+              departureTime: _departureTime,
+              delay: _delay,
+              track: _track,
+            ), // Call the extracted widget here
+            const SizedBox(height: 30),
+            if (_departureTime != '') ...[
+              ElevatedButton(
+                onPressed: _navigateToNewPage, // Call the navigation function
+                child: const Text('Los gehts!'),
+              ),
+            ],
           ],
         ),
       ),
@@ -283,14 +242,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
     String locationString = '${position.latitude},${position.longitude}';
     return locationString;
   }
-
-  final Map<String, IconData> modeIcons = {
-    'sl-icon-type-strain': Icons.train,
-    'sl-icon-type-bus': Icons.directions_bus,
-    'sl-icon-type-tram': Icons.tram,
-    'sl-icon-type-ship': Icons.directions_boat,
-    // Add more mode-icon pairs as needed
-  };
 
   Future<void> _getClosestStations() async {
     String? locationString = await getCurrentLocationString();
@@ -395,6 +346,140 @@ class _MyCustomFormState extends State<MyCustomForm> {
               }),
         ],
       ),
+    );
+  }
+}
+
+class StopsPage extends StatelessWidget {
+  final String mode;
+  final String modeIdentifier;
+  final String destination;
+  final String departureTime;
+  final String delay;
+  final String track;
+
+  StopsPage({
+    required this.mode,
+    required this.modeIdentifier,
+    required this.destination,
+    required this.departureTime,
+    required this.delay,
+    required this.track,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        title: Center(child: Text("Meine Verbindung")),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 30),
+            // Include the BuildConnectionDetails widget to show connection details
+            _BuildConnectionDetails(
+              mode: mode,
+              modeIdentifier: modeIdentifier,
+              destination: destination,
+              departureTime: departureTime,
+              delay: delay,
+              track: track,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BuildConnectionDetails extends StatelessWidget {
+  final String mode;
+  final String modeIdentifier;
+  final String destination;
+  final String departureTime;
+  final String delay;
+  final String track;
+
+  _BuildConnectionDetails({
+    required this.mode,
+    required this.modeIdentifier,
+    required this.destination,
+    required this.departureTime,
+    required this.delay,
+    required this.track,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (departureTime.isEmpty) {
+      return const SizedBox
+          .shrink(); // Return an empty SizedBox if departureTime is empty
+    }
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              modeIcons[mode],
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              '$modeIdentifier',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Richtung $destination',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Abfahrt um $departureTime',
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (delay != 'null') ...[
+              Text(
+                '+$delay',
+                style: const TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+            const SizedBox(width: 5),
+            if (track.isNotEmpty) ...[
+              Text(
+                'auf Gleis $track',
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }
