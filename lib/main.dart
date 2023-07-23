@@ -113,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (responseData['station']['name'] == null) {
         setState(() {
           _error = 'Bahnhof/Haltestelle nicht gefunden';
+          _isLoadingDeparture = false;
         });
       } else {
         _error = '';
@@ -135,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
         if (connections.isEmpty) {
           setState(() {
             _error = 'Keine Verbindungen in den nächsten 30 Minuten';
+            _isLoadingDeparture = false;
           });
           return;
         } else {
