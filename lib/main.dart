@@ -117,6 +117,12 @@ class _MyHomePageState extends State<MyHomePage> {
           return departureTime.difference(now).inMinutes > 30;
         });
 
+        // remove connections where destination is not of type string
+        connections.removeWhere((connection) {
+          var destination = connection['to'];
+          return destination.runtimeType != String;
+        });
+
         if (connections.isEmpty) {
           setState(() {
             _error = 'Keine Verbindungen in den nächsten 30 Minuten';
