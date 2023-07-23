@@ -98,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getRandomDeparture() async {
+    FocusScope.of(context).unfocus();
     setState(() {
       _isLoadingDeparture = true;
     });
