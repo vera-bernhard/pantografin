@@ -14,6 +14,7 @@ final Map<String, IconData> modeIcons = {
   'IR': Icons.train,
   'RE': Icons.train,
   'IC': Icons.train,
+  'TGV': Icons.train,
   'ICE': Icons.train,
   'EC': Icons.train,
   'B': Icons.directions_bus,
