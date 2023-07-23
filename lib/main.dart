@@ -33,7 +33,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key, Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title});
+  const MyHomePage({super.key, Key? key, required this.title});
 
   final String title;
 
@@ -329,7 +329,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 350,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,7 +350,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.location_on),
+                icon: const Icon(Icons.location_on),
                 onPressed: _getClosestStations,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -388,7 +388,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           Text(stationName),
                         ],
                       ),
-                      Text('${distance} m'),
+                      Text('$distance m'),
                     ],
                   ),
                 );
@@ -409,7 +409,7 @@ class StopsPage extends StatefulWidget {
   final List<String> stops;
   final List<String> arrivalTimes;
 
-  const StopsPage({
+  const StopsPage({super.key, 
     required this.mode,
     required this.modeIdentifier,
     required this.destination,
@@ -442,7 +442,7 @@ class _StopsPageState extends State<StopsPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        title: Center(child: Text("Meine Verbindung")),
+        title: const Center(child: Text("Meine Verbindung")),
       ),
       body: Center(
         child: Column(
@@ -533,7 +533,7 @@ class _StopsPageState extends State<StopsPage> {
                       widget.stops.length, (index) => index == randomIndex);
                   _scrollController.animateTo(
                     randomIndex * 56.0, // 56.0 is the height of each ListTile
-                    duration: Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
                   );
                 });
@@ -583,7 +583,7 @@ class _BuildConnectionDetails extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Text(
-              '$modeIdentifier',
+              modeIdentifier,
               style: const TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
