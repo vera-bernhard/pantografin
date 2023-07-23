@@ -33,7 +33,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, Key? key});
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, Key? key, required this.title});
+  const MyHomePage({Key? key, required this.title});
 
   final String title;
 
@@ -409,7 +409,8 @@ class StopsPage extends StatefulWidget {
   final List<String> stops;
   final List<String> arrivalTimes;
 
-  const StopsPage({super.key, 
+  const StopsPage({
+    super.key,
     required this.mode,
     required this.modeIdentifier,
     required this.destination,
