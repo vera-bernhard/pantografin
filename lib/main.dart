@@ -407,7 +407,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 final stationData = _possibleStations[index];
                 final icon = stationData['iconclass'];
                 final stationName = stationData['label'];
-                final distance = stationData['dist'];
+                var distance = stationData['dist'];
+                distance ??= '?';
 
                 return ElevatedButton(
                   onPressed: () {
