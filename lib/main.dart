@@ -118,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _error = '';
 
         // limit connections to only those in the next 30 minutes
+        final departureStation = responseData['station']['name'];
         var connections = responseData['stationboard'];
         connections.removeWhere((connection) {
           var departureTime = DateTime.parse(connection['stop']['departure']);
@@ -148,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
             var name = stop['station']['name'];
             var arrival = stop['arrival'];
             if (name == null) {
-              _allStops.add(_station);
+              _allStops.add(departureStation);
             } else {
               _allStops.add(name);
             }
@@ -162,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (connection['stop']['platform'] != null) {
               _track = connection['stop']['platform'];
             }
+            _station = departureStation;
             _departureTime = departureTime;
             _delay = connection['stop']['delay'].toString();
             _destination = connection['to'];
