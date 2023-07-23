@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _allArrivalTimes = [];
   bool _isLoadingDeparture = false;
 
-  String formatDateTime(String dateTimeString) {
+  String _formatDateTime(String dateTimeString) {
     tz.initializeTimeZones();
     DateTime dateTime = DateTime.parse(dateTimeString);
     tz.Location gmtPlus2 = tz.getLocation('Europe/Paris');
@@ -142,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
           var randomNumber = random.nextInt(min<int>(10, connections.length));
 
           final connection = responseData['stationboard'][randomNumber];
-          var departureTime = formatDateTime(connection['stop']['departure']);
+          var departureTime = _formatDateTime(connection['stop']['departure']);
 
           // iterate thourgh connection['passList'] and add all stops to _allStops
           for (var stop in connection['passList']) {
@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (arrival == null) {
               _allArrivalTimes.add(departureTime);
             } else {
-              _allArrivalTimes.add(formatDateTime(arrival));
+              _allArrivalTimes.add(_formatDateTime(arrival));
             }
           }
           setState(() {
@@ -285,7 +285,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   List<dynamic> _possibleStations = [];
   bool _isLoadingLocations = false;
 
-  Future<String?> getCurrentLocationString() async {
+  Future<String?> _getCurrentLocationCoords() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
@@ -330,7 +330,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
     FocusScope.of(context).unfocus();
 
-    String? locationString = await getCurrentLocationString();
+    String? locationString = await _getCurrentLocationCoords();
     if (locationString == null) {
       return;
     } else {
@@ -479,7 +479,6 @@ class _StopsPageState extends State<StopsPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the highlightedStops list with false values
     highlightedStops = List.generate(widget.stops.length, (index) => false);
   }
 
