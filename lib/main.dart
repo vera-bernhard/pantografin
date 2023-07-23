@@ -22,6 +22,7 @@ final Map<String, IconData> modeIcons = {
   'T': Icons.tram,
   'BAT': Icons.directions_boat,
   'sl-icon-type-strain': Icons.train,
+  'sl-icon-type-train': Icons.train,
   'sl-icon-type-bus': Icons.directions_bus,
   'sl-icon-type-tram': Icons.tram,
   'sl-icon-type-ship': Icons.directions_boat,
