@@ -12,6 +12,7 @@ final Map<String, IconData> modeIcons = {
   'S': Icons.train,
   'SN': Icons.train,
   'IR': Icons.train,
+  'RE': Icons.train,
   'IC': Icons.train,
   'ICE': Icons.train,
   'EC': Icons.train,
@@ -449,37 +450,67 @@ class _StopsPageState extends State<StopsPage> {
               track: widget.track,
             ),
             // Add a scrollable list of stops
+            const SizedBox(height: 30),
             Expanded(
-              child: ListView.builder(
-                controller:
-                    _scrollController, // Assign the ScrollController to the ListView
-                itemCount: widget.stops.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Row(
-                      children: [
-                        Text(
-                          widget.arrivalTimes[index],
-                          style: TextStyle(
-                            color: highlightedStops[index]
-                                ? Colors.red
-                                : Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey, // Set the border color
+                    width: 1.0, // Set the border width
+                  ),
+                ),
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  thickness: 5.0,
+                  controller: _scrollController,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: widget.stops.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Transform.rotate(
+                              angle: 45 * pi / 90,
+                              child: const IconButton(
+                                icon: Icon(
+                                  Icons.commit,
+                                  color: Colors.black,
+                                ),
+                                onPressed: null,
+                              ),
+                            ),
+                            Text(
+                              widget.arrivalTimes[index],
+                              style: TextStyle(
+                                color: highlightedStops[index]
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.black,
+                                fontWeight: index == 0 ||
+                                        index == widget.stops.length - 1
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              widget.stops[index],
+                              style: TextStyle(
+                                color: highlightedStops[index]
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.black,
+                                fontWeight: index == 0 ||
+                                        index == widget.stops.length - 1
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Text(
-                          widget.stops[index],
-                          style: TextStyle(
-                            color: highlightedStops[index]
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
             // Add a button
