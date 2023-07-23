@@ -239,21 +239,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-            _BuildConnectionDetails(
-              mode: _mode,
-              modeIdentifier: _modeIdentifier,
-              destination: _destination,
-              departureTime: _departureTime,
-              delay: _delay,
-              track: _track,
+            Visibility(
+              visible: !_isLoadingDeparture,
+              child: _ConnectionDetails(
+                mode: _mode,
+                modeIdentifier: _modeIdentifier,
+                destination: _destination,
+                departureTime: _departureTime,
+                delay: _delay,
+                track: _track,
+              ),
             ), // Call the extracted widget here
             const SizedBox(height: 30),
-            if (_departureTime != '') ...[
-              ElevatedButton(
+            Visibility(
+              visible: !_isLoadingDeparture && _departureTime != '',
+              child: ElevatedButton(
                 onPressed: _navigateToNewPage, // Call the navigation function
                 child: const Text('Los gehts!'),
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -285,6 +289,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
       return null;
     }
 
+    setState(() {
+      _possibleStations = [];
+    });
+
     LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.deniedForever) {
@@ -313,6 +321,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
       _isLoadingLocations = true;
     });
 
+    if (widget.homePageState != null) {
+      widget.homePageState!.resetDeparture();
+    }
+
     FocusScope.of(context).unfocus();
 
     String? locationString = await getCurrentLocationString();
@@ -333,10 +345,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
         setState(() {
           _possibleStations = possibleStations;
         });
-
-        if (widget.homePageState != null) {
-          widget.homePageState!.resetDeparture();
-        }
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
@@ -485,7 +493,7 @@ class _StopsPageState extends State<StopsPage> {
           children: [
             const SizedBox(height: 30),
             // Include the BuildConnectionDetails widget to show connection details
-            _BuildConnectionDetails(
+            _ConnectionDetails(
               mode: widget.mode,
               modeIdentifier: widget.modeIdentifier,
               destination: widget.destination,
@@ -583,7 +591,7 @@ class _StopsPageState extends State<StopsPage> {
   }
 }
 
-class _BuildConnectionDetails extends StatelessWidget {
+class _ConnectionDetails extends StatelessWidget {
   final String mode;
   final String modeIdentifier;
   final String destination;
@@ -591,7 +599,7 @@ class _BuildConnectionDetails extends StatelessWidget {
   final String delay;
   final String track;
 
-  const _BuildConnectionDetails({
+  const _ConnectionDetails({
     required this.mode,
     required this.modeIdentifier,
     required this.destination,
