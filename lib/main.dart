@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _modeIdentifier = '';
   String _error = '';
   List<String> _allStops = [];
+  List<String> _allArrivalTimes = [];
 
   String formatDateTime(String dateTimeString) {
     tz.initializeTimeZones();
@@ -87,17 +88,15 @@ class _MyHomePageState extends State<MyHomePage> {
       _modeIdentifier = '';
       _error = '';
       _allStops = [];
+      _allArrivalTimes = [];
     });
   }
 
   Future<void> _getRandomDeparture() async {
-    const int limit = 10;
+    const int limit = 50;
     final String api =
         'http://transport.opendata.ch/v1/stationboard?station=$_station&limit=$limit';
     final response = await http.get(Uri.parse(api));
-
-    var random = Random();
-    var randomNumber = random.nextInt(limit);
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
@@ -112,32 +111,43 @@ class _MyHomePageState extends State<MyHomePage> {
         // limit connections to only those in the next 30 minutes
         var connections = responseData['stationboard'];
         connections.removeWhere((connection) {
-          var departure = DateTime.parse(connection['stop']['departure']);
+          var departureTime = DateTime.parse(connection['stop']['departure']);
           var now = DateTime.now();
-          return departure.difference(now).inMinutes > 30;
+          return departureTime.difference(now).inMinutes > 30;
         });
+
         if (connections.isEmpty) {
           setState(() {
             _error = 'Keine Verbindungen in den nächsten 30 Minuten';
           });
           return;
         } else {
+          var random = Random();
+          var randomNumber = random.nextInt(min<int>(10, connections.length));
+
           final connection = responseData['stationboard'][randomNumber];
+          var departureTime = formatDateTime(connection['stop']['departure']);
 
           // iterate thourgh connection['passList'] and add all stops to _allStops
           for (var stop in connection['passList']) {
             var name = stop['station']['name'];
+            var arrival = stop['arrival'];
             if (name == null) {
               _allStops.add(_station);
             } else {
               _allStops.add(name);
+            }
+            if (arrival == null) {
+              _allArrivalTimes.add(departureTime);
+            } else {
+              _allArrivalTimes.add(formatDateTime(arrival));
             }
           }
           setState(() {
             if (connection['stop']['platform'] != null) {
               _track = connection['stop']['platform'];
             }
-            _departureTime = formatDateTime(connection['stop']['departure']);
+            _departureTime = departureTime;
             _delay = connection['stop']['delay'].toString();
             _destination = connection['to'];
             _mode = connection['category'];
@@ -162,6 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
           delay: _delay,
           track: _track,
           stops: _allStops,
+          arrivalTimes: _allArrivalTimes,
         ),
       ),
     );
@@ -386,6 +397,7 @@ class StopsPage extends StatefulWidget {
   final String delay;
   final String track;
   final List<String> stops;
+  final List<String> arrivalTimes;
 
   const StopsPage({
     required this.mode,
@@ -395,6 +407,7 @@ class StopsPage extends StatefulWidget {
     required this.delay,
     required this.track,
     required this.stops,
+    required this.arrivalTimes,
   });
 
   @override
@@ -443,12 +456,27 @@ class _StopsPageState extends State<StopsPage> {
                 itemCount: widget.stops.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
-                    title: Text(
-                      widget.stops[index],
-                      style: TextStyle(
-                        color:
-                            highlightedStops[index] ? Colors.red : Colors.black,
-                      ),
+                    title: Row(
+                      children: [
+                        Text(
+                          widget.arrivalTimes[index],
+                          style: TextStyle(
+                            color: highlightedStops[index]
+                                ? Colors.red
+                                : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          widget.stops[index],
+                          style: TextStyle(
+                            color: highlightedStops[index]
+                                ? Colors.red
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
