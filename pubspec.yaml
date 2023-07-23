@@ -39,6 +39,7 @@ dependencies:
   intl: ^0.18.1
   timezone: ^0.9.2  # For time zone handling
   geolocator: ^9.0.2
+  loading_animation_widget: ^1.2.0+4
 
 dev_dependencies:
   flutter_test:

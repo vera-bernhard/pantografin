@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:geolocator/geolocator.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 // Define modeIcons as a global constant
 final Map<String, IconData> modeIcons = {
@@ -71,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _error = '';
   List<String> _allStops = [];
   List<String> _allArrivalTimes = [];
+  bool _isLoadingDeparture = false;
 
   String formatDateTime(String dateTimeString) {
     tz.initializeTimeZones();
@@ -96,6 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getRandomDeparture() async {
+    setState(() {
+      _isLoadingDeparture = true;
+    });
     const int limit = 50;
     final String api =
         'http://transport.opendata.ch/v1/stationboard?station=$_station&limit=$limit';
@@ -167,6 +172,9 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       print('API request failed with status code: ${response.statusCode}');
     }
+    setState(() {
+      _isLoadingDeparture = false;
+    });
   }
 
   void _navigateToNewPage() {
@@ -212,6 +220,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _getRandomDeparture,
               child: const Text('Zufällige Verbindung'),
             ),
+            Center(
+                child: Visibility(
+              visible: _isLoadingDeparture,
+              child: LoadingAnimationWidget.waveDots(
+                color: Theme.of(context).colorScheme.primary,
+                size: 50,
+              ),
+            )),
             const SizedBox(height: 30),
             if (_error != '') ...[
               Text(
@@ -260,6 +276,7 @@ class MyCustomForm extends StatefulWidget {
 class _MyCustomFormState extends State<MyCustomForm> {
   final TextEditingController _stationController = TextEditingController();
   List<dynamic> _possibleStations = [];
+  bool _isLoadingLocations = false;
 
   Future<String?> getCurrentLocationString() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -292,6 +309,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   Future<void> _getClosestStations() async {
+    setState(() {
+      _isLoadingLocations = true;
+    });
+
     FocusScope.of(context).unfocus();
 
     String? locationString = await getCurrentLocationString();
@@ -320,6 +341,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
         print('API request failed with status code: ${response.statusCode}');
       }
     }
+    setState(() {
+      _isLoadingLocations = false;
+    });
   }
 
   @override
@@ -356,6 +380,15 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 color: Theme.of(context).colorScheme.primary,
               ),
             ],
+          ),
+          Center(
+            child: Visibility(
+              visible: _isLoadingLocations,
+              child: LoadingAnimationWidget.waveDots(
+                color: Theme.of(context).colorScheme.primary,
+                size: 50,
+              ),
+            ),
           ),
           const SizedBox(
               height: 10), // Add some spacing between TextField and buttons
