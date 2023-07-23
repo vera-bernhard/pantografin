@@ -290,6 +290,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   Future<void> _getClosestStations() async {
+    FocusScope.of(context).unfocus();
+
     String? locationString = await getCurrentLocationString();
     if (locationString == null) {
       return;
