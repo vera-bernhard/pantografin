@@ -10,6 +10,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 // Define modeIcons as a global constant
 final Map<String, IconData> modeIcons = {
+  'FUN': Icons.directions_subway,
   'S': Icons.train,
   'SN': Icons.train,
   'IR': Icons.train,
