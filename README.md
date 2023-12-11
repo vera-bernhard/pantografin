@@ -1,16 +1,27 @@
-# sbb_roulette
+# SBB Roulette
 
-A new Flutter project.
+<img align="left" width="70" height="70" src="assets/sbb_roulette_circle.png" style="margin-right:10px;">
 
-## Getting Started
+Embark on a spontaneous Swiss adventure with my mobile app! Utilize your GA or Day pass to the fullest by letting SBB Roulette choose your mode of transport and your destination. 
+Head to the nearest stop, embrace the randomness, and enjoy the ride. Once leaning back on your train, tram, bus, funicular or ship, let SBB Roulette decide on the best moment to hop off. 
 
-This project is a starting point for a Flutter application.
+## Some impressions
 
-A few resources to get you started if this is your first Flutter project:
+<img align="left" width="200" src="assets/screenshot_1.png" style="margin-right:50px;">
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+<img width="200" src="assets/screenshot_2.png" style="margin-right:10px;">
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tech Stack
+
+This mobile app is created with [Flutter](https://flutter.dev/), a cross-platform, open-source UI Software.
+
+To get the realtime transportation data, the following APIs are used:
+
+* [Timetable API](https://search.ch/timetable/api/help) from search.ch
+* [Swiss public transport API](http://transport.opendata.ch/) powered by [Opendata.ch](https://opendata.ch/)
+
+## Comming soon
+
+I am planning to release this app in Google Play Store in the beginning of next year (2024) :upside_down_face
+
+I also want to work on some more features like adding filtering options on the randomly chosen connections, saving the travel history and English language support (the app is currently in German).
