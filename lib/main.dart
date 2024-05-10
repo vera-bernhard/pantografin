@@ -28,6 +28,7 @@ final Map<String, IconData> modeIcons = {
   'sl-icon-type-bus': Icons.directions_bus,
   'sl-icon-type-tram': Icons.tram,
   'sl-icon-type-ship': Icons.directions_boat,
+  'sl-icon-type-funicular': Icons.directions_subway
   // Add more mode-icon pairs as needed
 };
 
