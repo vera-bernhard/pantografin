@@ -318,7 +318,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
       desiredAccuracy: LocationAccuracy.best,
     );
 
-    
     return [position.latitude, position.longitude];
   }
 
@@ -349,6 +348,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
         possibleStations.removeWhere((item) => item['id'] == null);
         possibleStations =
             possibleStations.sublist(0, min<int>(10, possibleStations.length));
+        setState(() {
+          _possibleStations = possibleStations;
+        });
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
