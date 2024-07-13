@@ -333,9 +333,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
     FocusScope.of(context).unfocus();
 
     List<double>? locationString = await _getCurrentLocationCoords();
-    final x = 47.390380;
-    final y = 8.169546;
-    print(locationString);
+    final x = locationString?[0];
+    final y = locationString?[1];
     if (locationString == null) {
       return;
     } else {
