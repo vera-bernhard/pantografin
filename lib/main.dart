@@ -289,7 +289,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   List<dynamic> _possibleStations = [];
   bool _isLoadingLocations = false;
 
-  Future<String?> _getCurrentLocationCoords() async {
+  Future<List<double>?> _getCurrentLocationCoords() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
@@ -319,8 +319,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       desiredAccuracy: LocationAccuracy.best,
     );
 
-    String locationString = '${position.latitude},${position.longitude}';
-    return locationString;
+    
+    return [position.latitude, position.longitude];
   }
 
   Future<void> _getClosestStations() async {
@@ -334,7 +334,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
     FocusScope.of(context).unfocus();
 
-    String? locationString = await _getCurrentLocationCoords();
+    List<double>? locationString = await _getCurrentLocationCoords();
+    print(locationString);
     if (locationString == null) {
       return;
     } else {
