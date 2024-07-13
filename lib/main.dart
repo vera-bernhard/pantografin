@@ -410,9 +410,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
               itemCount: _possibleStations.length,
               itemBuilder: (BuildContext context, int index) {
                 final stationData = _possibleStations[index];
-                final icon = stationData['iconclass'];
-                final stationName = stationData['label'];
-                var distance = stationData['dist'];
+                final icon = stationData['icon'];
+                final stationName = stationData['name'];
+                var distance = stationData['distance'];
                 distance ??= '?';
 
                 return ElevatedButton(
