@@ -291,7 +291,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   Future<String?> _getCurrentLocationCoords() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-
     if (!isLocationServiceEnabled) {
       return null;
     }
@@ -335,23 +334,20 @@ class _MyCustomFormState extends State<MyCustomForm> {
     FocusScope.of(context).unfocus();
 
     String? locationString = await _getCurrentLocationCoords();
+    final x = 47.390380;
+    final y = 8.169546;
     if (locationString == null) {
       return;
     } else {
-      final String api =
-          'https://timetable.search.ch/api/completion.json?latlon=$locationString';
+      final String api = 'http://transport.opendata.ch/v1/locations?x=$x&y=$y';
       final response = await http.get(Uri.parse(api));
-
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        responseData
-            .removeWhere((item) => item["iconclass"] == "sl-icon-type-adr");
-        var possibleStations =
-            responseData.sublist(0, min<int>(10, responseData.length));
-
-        setState(() {
-          _possibleStations = possibleStations;
-        });
+        var possibleStations = responseData['stations'];
+        // remove where id is null = proxy for stations (as type==station not working)
+        possibleStations.removeWhere((item) => item['id'] == null);
+        possibleStations =
+            possibleStations.sublist(0, min<int>(10, possibleStations.length));
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
