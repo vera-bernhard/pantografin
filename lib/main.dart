@@ -274,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class MyCustomForm extends StatefulWidget {
   final ValueChanged<String> onStationChanged;
-  final _MyHomePageState? homePageState; // Add this line
+  final _MyHomePageState? homePageState;
 
   const MyCustomForm(
       {Key? key, required this.onStationChanged, this.homePageState})
@@ -342,14 +342,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       final response = await http.get(Uri.parse(api));
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        var possibleStations = responseData['stations'];
-        // remove where id is null = proxy for stations (as type==station not working)
-        possibleStations.removeWhere((item) => item['id'] == null);
-        possibleStations =
-            possibleStations.sublist(0, min<int>(10, possibleStations.length));
-        setState(() {
-          _possibleStations = possibleStations;
-        });
+        _handleStationResponse(responseData);
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
@@ -359,10 +352,37 @@ class _MyCustomFormState extends State<MyCustomForm> {
     });
   }
 
-  @override
-  void dispose() {
-    _stationController.dispose();
-    super.dispose();
+  Future<void> _getStationsByString(String stationString) async {
+    setState(() {
+      _isLoadingLocations = true;
+    });
+
+    if (widget.homePageState != null) {
+      widget.homePageState!.resetDeparture();
+    }
+    final String api =
+        'http://transport.opendata.ch/v1/locations?query=$stationString';
+    final response = await http.get(Uri.parse(api));
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      _handleStationResponse(responseData);
+    } else {
+      print('API request failed with status code: ${response.statusCode}');
+    }
+    setState(() {
+      _isLoadingLocations = false;
+    });
+  }
+
+  void _handleStationResponse(Map<String, dynamic> responseData) {
+    var possibleStations = responseData['stations'];
+    // remove where id is null = proxy for stations (as type==station not working)
+    possibleStations.removeWhere((item) => item['id'] == null);
+    possibleStations =
+        possibleStations.sublist(0, min<int>(10, possibleStations.length));
+    setState(() {
+      _possibleStations = possibleStations;
+    });
   }
 
   @override
@@ -384,6 +404,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   ),
                   onChanged: (String value) {
                     widget.onStationChanged(value);
+                  },
+                  onSubmitted: (String value) {
+                    _getStationsByString(value);
                   },
                 ),
               ),
