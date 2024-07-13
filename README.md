@@ -22,6 +22,6 @@ To get the realtime transportation data, the following APIs are used:
 
 ## Comming soon
 
-I am planning to release this app in Google Play Store in the beginning of next year (2024) :upside_down_face
+I am planning to release this app in Google Play Store in the beginning of next year (2024)
 
 I also want to work on some more features like adding filtering options on the randomly chosen connections, saving the travel history and English language support (the app is currently in German).
