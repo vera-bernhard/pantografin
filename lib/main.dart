@@ -451,7 +451,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
               itemCount: _possibleStations.length,
               itemBuilder: (BuildContext context, int index) {
                 final stationData = _possibleStations[index];
-                final icon = stationData['icon'];
+                // if icon is null, set it to 'train' as default
+                final icon = stationData['icon'] ?? 'train';
                 final stationName = stationData['name'];
                 var distance = stationData['distance'];
 
