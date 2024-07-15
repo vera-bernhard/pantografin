@@ -293,13 +293,13 @@ class _MyCustomFormState extends State<MyCustomForm> {
   final TextEditingController _stationController = TextEditingController();
   List<dynamic> _possibleStations = [];
   bool _isLoadingLocations = false;
+  String _error = '';
 
   Future<List<double>?> _getCurrentLocationCoords() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!isLocationServiceEnabled) {
       return null;
     }
-
     setState(() {
       _possibleStations = [];
     });
@@ -341,7 +341,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
     final x = locationString?[0];
     final y = locationString?[1];
     if (locationString == null) {
-      return;
+      setState(() {
+        _error = 'Standortsuche fehlgeschlagen, brauch das Suchfeld';
+      });
     } else {
       final String api = 'http://transport.opendata.ch/v1/locations?x=$x&y=$y';
       final response = await http.get(Uri.parse(api));
@@ -368,6 +370,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   Future<void> _getStationsByString(String stationString) async {
     setState(() {
       _isLoadingLocations = true;
+      _error = '';
     });
 
     if (widget.homePageState != null) {
@@ -390,12 +393,20 @@ class _MyCustomFormState extends State<MyCustomForm> {
         setState(() {
           _possibleStations = [];
         });
+      } else if (possibleStations.length == 0) {
+        setState(() {
+          _error = 'Bahnhof/Haltestelle nicht gefunden';
+          _possibleStations = [];
+        });
       } else {
         setState(() {
           _possibleStations = possibleStations;
         });
       }
     } else {
+      setState(() {
+        _error = 'API Anfrage fehlgeschlagen';
+      });
       print('API request failed with status code: ${response.statusCode}');
     }
     setState(() {
@@ -444,6 +455,20 @@ class _MyCustomFormState extends State<MyCustomForm> {
               ),
             ),
           ),
+          if (_error != '') ...[
+            const SizedBox(
+                height: 20), // Add some space before the error message
+            Center(
+              child: Text(
+                _error,
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(
               height: 10), // Add some spacing between TextField and buttons
           ListView.builder(
