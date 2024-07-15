@@ -347,7 +347,15 @@ class _MyCustomFormState extends State<MyCustomForm> {
       final response = await http.get(Uri.parse(api));
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        _handleStationResponse(responseData);
+        var possibleStations = responseData['stations'];
+        // remove where id is null = proxy for stations (as type==station not working)
+        possibleStations.removeWhere((item) => item['id'] == null);
+        possibleStations =
+            possibleStations.sublist(0, min<int>(10, possibleStations.length));
+
+        setState(() {
+          _possibleStations = possibleStations;
+        });
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
@@ -370,23 +378,28 @@ class _MyCustomFormState extends State<MyCustomForm> {
     final response = await http.get(Uri.parse(api));
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
-      _handleStationResponse(responseData);
+      var possibleStations = responseData['stations'];
+      // remove where id is null = proxy for stations (as type==station not working)
+      possibleStations.removeWhere((item) => item['id'] == null);
+      possibleStations =
+          possibleStations.sublist(0, min<int>(10, possibleStations.length));
+      // if only one station is found, set the station name in the text field
+      if (possibleStations.length == 1) {
+        _stationController.text = possibleStations[0]['name'];
+        widget.onStationChanged(possibleStations[0]['name']);
+        setState(() {
+          _possibleStations = [];
+        });
+      } else {
+        setState(() {
+          _possibleStations = possibleStations;
+        });
+      }
     } else {
       print('API request failed with status code: ${response.statusCode}');
     }
     setState(() {
       _isLoadingLocations = false;
-    });
-  }
-
-  void _handleStationResponse(Map<String, dynamic> responseData) {
-    var possibleStations = responseData['stations'];
-    // remove where id is null = proxy for stations (as type==station not working)
-    possibleStations.removeWhere((item) => item['id'] == null);
-    possibleStations =
-        possibleStations.sublist(0, min<int>(10, possibleStations.length));
-    setState(() {
-      _possibleStations = possibleStations;
     });
   }
 
@@ -441,7 +454,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 final icon = stationData['icon'];
                 final stationName = stationData['name'];
                 var distance = stationData['distance'];
-                distance ??= '?';
 
                 return ElevatedButton(
                   onPressed: () {
@@ -463,8 +475,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           const SizedBox(width: 5),
                           Text(stationName),
                         ],
-                      ),
-                      Text('$distance m'),
+                      ), // only show if distance is available, else shrink the row
+                      if (distance != null) Text('$distance m'),
                     ],
                   ),
                 );
