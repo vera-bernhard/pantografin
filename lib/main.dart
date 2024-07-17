@@ -50,7 +50,13 @@ final Map<String, List<String>> transportFilter = {
   'cableway': ['Seilbahn/Zahnradbahn'],
 };
 
-final Map<String, List<String>> filterToModes = {
+// 'Schiff': 'ship', 'ICE/TGV/RJX': 'train'...
+final Map<String, String> filterlabelsToIconNames = {
+  for (var key in transportFilter.keys)
+    for (var filterLabel in transportFilter[key]!) filterLabel: key,
+};
+
+final Map<String, List<String>> filterlabelsToModes = {
   'ICE/TGV/RJX': ['ICE', 'TGV', 'RJX'],
   'EC/IC': ['EC', 'IC'],
   'IR/PE': ['IR', 'PE'],
@@ -62,12 +68,9 @@ final Map<String, List<String>> filterToModes = {
   'Seilbahn/Zahnradbahn': ['FUN'],
 };
 
+// 'ICE/TGV/RJX', 'EC/IC'...
 final List<String> transportFilterFlat =
     transportFilter.values.expand((e) => e).toList();
-
-final Map<String, IconData> transportFilterIcons = Map.fromEntries(
-    transportFilter.entries.expand((entry) => entry.value.map(
-        (filter) => MapEntry(filter, modeIcons[entry.key] ?? Icons.error))));
 
 void main() {
   runApp(const MyApp());
@@ -149,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isLoadingDeparture = true;
     });
-    const int limit = 50;
+    const int limit = 80;
     final String api =
         'http://transport.opendata.ch/v1/stationboard?station=$_station&limit=$limit';
     final response = await http.get(Uri.parse(api));
@@ -159,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       resetDeparture();
       if (responseData['station']['name'] == null) {
         setState(() {
-          _error = 'Bahnhof/Haltestelle nicht gefunden';
+          _error = 'Abfahrtsort nicht gefunden';
           _isLoadingDeparture = false;
         });
       } else {
@@ -175,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
 
         // filter connections based on selected filters
-        final List<String> filterModes = filterToModes.entries
+        final List<String> filterModes = filterlabelsToModes.entries
             .where((entry) => _selectedFilters.contains(entry.key))
             .expand((entry) => entry.value)
             .toList();
@@ -191,10 +194,18 @@ class _MyHomePageState extends State<MyHomePage> {
         });
 
         if (connections.isEmpty) {
-          setState(() {
-            _error = 'Keine Verbindungen in den nächsten 30 Minuten';
-            _isLoadingDeparture = false;
-          });
+          if (_selectedFilters.length != transportFilterFlat.length) {
+            setState(() {
+              _error =
+                  'Keine Verbindungen in den nächsten 30 Minuten mit den ausgewählten Filtern';
+              _isLoadingDeparture = false;
+            });
+          } else {
+            setState(() {
+              _error = 'Keine Verbindungen in den nächsten 30 Minuten';
+              _isLoadingDeparture = false;
+            });
+          }
           return;
         } else {
           var random = Random();
@@ -277,50 +288,57 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
               homePageState: this,
-              selectedFilters:
-                  transportFilterFlat, // Make sure transportFilterFlat is defined or imported
+              selectedFilters: transportFilterFlat,
             ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _getRandomDeparture,
-              child: const Text('Zufällige Verbindung'),
-            ),
-            Center(
-                child: Visibility(
-              visible: _isLoadingDeparture,
-              child: LoadingAnimationWidget.waveDots(
-                color: Theme.of(context).colorScheme.primary,
-                size: 50,
-              ),
-            )),
-            const SizedBox(height: 30),
-            if (_error != '') ...[
-              Text(
-                _error,
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-            ],
             Visibility(
-              visible: !_isLoadingDeparture,
-              child: _ConnectionDetails(
-                mode: _mode,
-                modeIdentifier: _modeIdentifier,
-                destination: _destination,
-                departureTime: _departureTime,
-                delay: _delay,
-                track: _track,
-              ),
-            ), // Call the extracted widget here
-            const SizedBox(height: 30),
-            Visibility(
-              visible: !_isLoadingDeparture && _departureTime != '',
-              child: ElevatedButton(
-                onPressed: _navigateToNewPage, // Call the navigation function
-                child: const Text('Los gehts!'),
+              visible: _station.isNotEmpty,
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _getRandomDeparture,
+                    child: const Text('Zufällige Verbindung'),
+                  ),
+                  Center(
+                    child: Visibility(
+                      visible: _isLoadingDeparture,
+                      child: LoadingAnimationWidget.waveDots(
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 50,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  if (_error != '') ...[
+                    Text(
+                      _error,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                  Visibility(
+                    visible: !_isLoadingDeparture,
+                    child: _ConnectionDetails(
+                      mode: _mode,
+                      modeIdentifier: _modeIdentifier,
+                      destination: _destination,
+                      departureTime: _departureTime,
+                      delay: _delay,
+                      track: _track,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  Visibility(
+                    visible: !_isLoadingDeparture && _departureTime != '',
+                    child: ElevatedButton(
+                      onPressed: _navigateToNewPage,
+                      child: const Text('Los gehts!'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -395,6 +413,7 @@ class _StationSearchFormState extends State<StationSearchForm> {
   Future<void> _getClosestStations() async {
     setState(() {
       _isLoadingLocations = true;
+      _error = '';
     });
 
     if (widget.homePageState != null) {
@@ -415,15 +434,24 @@ class _StationSearchFormState extends State<StationSearchForm> {
       final response = await http.get(Uri.parse(api));
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
-        var possibleStations = responseData['stations'];
-        // remove where id is null = proxy for stations (as type==station not working)
-        possibleStations.removeWhere((item) => item['id'] == null);
-        possibleStations =
-            possibleStations.sublist(0, min<int>(10, possibleStations.length));
+        var possibleStations = _filterStations(responseData['stations']);
 
-        setState(() {
-          _possibleStations = possibleStations;
-        });
+        if (possibleStations.length == 0) {
+          if (_selectedFilters.length != transportFilterFlat.length) {
+            setState(() {
+              _error =
+                  'Keine Bahnhöfe/Haltestellen in der Nähe gefunden, versuche es mit einem anderen Filtern';
+            });
+          } else {
+            setState(() {
+              _error = 'Keine Bahnhöfe/Haltestellen in der Nähe gefunden';
+            });
+          }
+        } else {
+          setState(() {
+            _possibleStations = possibleStations;
+          });
+        }
       } else {
         print('API request failed with status code: ${response.statusCode}');
       }
@@ -438,7 +466,13 @@ class _StationSearchFormState extends State<StationSearchForm> {
       _isLoadingLocations = true;
       _error = '';
     });
-
+    if (stationString.length == 0) {
+      setState(() {
+        _error = 'Bitte gib einen Bahnhof/Haltestelle ein';
+        _isLoadingLocations = false;
+      });
+      return;
+    }
     if (widget.homePageState != null) {
       widget.homePageState!.resetDeparture();
     }
@@ -447,11 +481,7 @@ class _StationSearchFormState extends State<StationSearchForm> {
     final response = await http.get(Uri.parse(api));
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
-      var possibleStations = responseData['stations'];
-      // remove where id is null = proxy for stations (as type==station not working)
-      possibleStations.removeWhere((item) => item['id'] == null);
-      possibleStations =
-          possibleStations.sublist(0, min<int>(10, possibleStations.length));
+      var possibleStations = _filterStations(responseData['stations']);
       // if only one station is found, set the station name in the text field
       if (possibleStations.length == 1) {
         _stationController.text = possibleStations[0]['name'];
@@ -460,10 +490,17 @@ class _StationSearchFormState extends State<StationSearchForm> {
           _possibleStations = [];
         });
       } else if (possibleStations.length == 0) {
-        setState(() {
-          _error = 'Bahnhof/Haltestelle nicht gefunden';
-          _possibleStations = [];
-        });
+        // if a filter is set, show a different error message
+        if (_selectedFilters.length != transportFilterFlat.length) {
+          setState(() {
+            _error =
+                'Bahnhof/Haltestelle nicht gefunden, versuche es mit einem anderen Filtern';
+          });
+        } else {
+          setState(() {
+            _error = 'Bahnhof/Haltestelle nicht gefunden';
+          });
+        }
       } else {
         setState(() {
           _possibleStations = possibleStations;
@@ -478,6 +515,22 @@ class _StationSearchFormState extends State<StationSearchForm> {
     setState(() {
       _isLoadingLocations = false;
     });
+  }
+
+  List<dynamic> _filterStations(List<dynamic> possibleStations) {
+    // remove where id is null = proxy for stations (as type==station not working)
+    possibleStations.removeWhere((item) => item['id'] == null);
+    possibleStations =
+        possibleStations.sublist(0, min<int>(10, possibleStations.length));
+    // remove stations based on selected filters
+    possibleStations.removeWhere((item) {
+      var mode = item['icon'];
+      var filterIcons = _selectedFilters.map((filter) {
+        return filterlabelsToIconNames[filter];
+      }).toList();
+      return !filterIcons.contains(mode);
+    });
+    return possibleStations;
   }
 
   Future<void> _openFilterDialog() async {
@@ -873,7 +926,7 @@ class _FilterDialogState extends State<FilterDialog> {
                 children: [
                   // Icon
                   Icon(
-                    transportFilterIcons[filter],
+                    modeIcons[filterlabelsToIconNames[filter]],
                     color: Theme.of(context).colorScheme.tertiary,
                   ),
                   const SizedBox(
