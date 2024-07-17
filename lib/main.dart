@@ -50,6 +50,18 @@ final Map<String, List<String>> transportFilter = {
   'cableway': ['Seilbahn/Zahnradbahn'],
 };
 
+final Map<String, List<String>> filterToModes = {
+  'ICE/TGV/RJX': ['ICE', 'TGV', 'RJX'],
+  'EC/IC': ['EC', 'IC'],
+  'IR/PE': ['IR', 'PE'],
+  'RE': ['RE'],
+  'S/SN/R': ['S', 'SN', 'R'],
+  'Bus': ['B', 'BN'],
+  'Tram': ['T'],
+  'Schiff': ['BAT'],
+  'Seilbahn/Zahnradbahn': ['FUN'],
+};
+
 final List<String> transportFilterFlat =
     transportFilter.values.expand((e) => e).toList();
 
@@ -100,6 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _allStops = [];
   List<String> _allArrivalTimes = [];
   bool _isLoadingDeparture = false;
+  List<String> _selectedFilters =
+      transportFilterFlat; // Initialize with default filters
 
   String _formatDateTime(String dateTimeString) {
     tz.initializeTimeZones();
@@ -108,6 +122,12 @@ class _MyHomePageState extends State<MyHomePage> {
     tz.TZDateTime gmtPlus2DateTime = tz.TZDateTime.from(dateTime, gmtPlus2);
     String formattedTime = DateFormat('HH:mm').format(gmtPlus2DateTime);
     return formattedTime;
+  }
+
+  void updateSelectedFilters(List<String> filters) {
+    setState(() {
+      _selectedFilters = filters;
+    });
   }
 
   void resetDeparture() {
@@ -152,6 +172,16 @@ class _MyHomePageState extends State<MyHomePage> {
           var departureTime = DateTime.parse(connection['stop']['departure']);
           var now = DateTime.now();
           return departureTime.difference(now).inMinutes > 30;
+        });
+
+        // filter connections based on selected filters
+        final List<String> filterModes = filterToModes.entries
+            .where((entry) => _selectedFilters.contains(entry.key))
+            .expand((entry) => entry.value)
+            .toList();
+        connections.removeWhere((connection) {
+          var mode = connection['category'];
+          return !filterModes.contains(mode);
         });
 
         // remove connections where destination is not of type string
@@ -241,12 +271,15 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const SizedBox(height: 30),
             StationSearchForm(
-                onStationChanged: (station) {
-                  setState(() {
-                    _station = station;
-                  });
-                },
-                homePageState: this),
+              onStationChanged: (station) {
+                setState(() {
+                  _station = station;
+                });
+              },
+              homePageState: this,
+              selectedFilters:
+                  transportFilterFlat, // Make sure transportFilterFlat is defined or imported
+            ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: _getRandomDeparture,
@@ -300,10 +333,14 @@ class _MyHomePageState extends State<MyHomePage> {
 class StationSearchForm extends StatefulWidget {
   final ValueChanged<String> onStationChanged;
   final _MyHomePageState? homePageState;
+  final List<String> selectedFilters; // Define selectedFilters as a field
 
-  const StationSearchForm(
-      {Key? key, required this.onStationChanged, this.homePageState})
-      : super(key: key);
+  const StationSearchForm({
+    Key? key,
+    required this.onStationChanged,
+    this.homePageState,
+    required this.selectedFilters, // Initialize selectedFilters
+  }) : super(key: key);
 
   @override
   _StationSearchFormState createState() => _StationSearchFormState();
@@ -450,11 +487,12 @@ class _StationSearchFormState extends State<StationSearchForm> {
         return FilterDialog(selectedFilters: _selectedFilters);
       },
     );
-
     if (selectedFilters != null) {
       setState(() {
         _selectedFilters = selectedFilters;
       });
+      // Pass selected filters back to _MyHomePageState
+      widget.homePageState?.updateSelectedFilters(selectedFilters);
     }
   }
 
