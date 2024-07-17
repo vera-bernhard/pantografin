@@ -18,7 +18,12 @@ final Map<String, IconData> modeIcons = {
   'IC': Icons.train,
   'TGV': Icons.train,
   'ICE': Icons.train,
+  'RJX': Icons.train,
   'EC': Icons.train,
+  'PE': Icons.train,
+  'R': Icons.train,
+  'ARZ': Icons.train,
+  'EXT': Icons.train,
   'B': Icons.directions_bus,
   'BN': Icons.directions_bus,
   'T': Icons.tram,
@@ -36,6 +41,21 @@ final Map<String, IconData> modeIcons = {
   'ship': Icons.directions_boat
   // Add more mode-icon pairs as needed
 };
+
+final Map<String, List<String>> transportFilter = {
+  'train': ['ICE/TGV/RJX', 'EC/IC', 'IR/PE', 'RE', 'S/SN/R'],
+  'bus': ['Bus'],
+  'tram': ['Tram'],
+  'ship': ['Schiff'],
+  'cableway': ['Seilbahn/Zahnradbahn'],
+};
+
+final List<String> transportFilterFlat =
+    transportFilter.values.expand((e) => e).toList();
+
+final Map<String, IconData> transportFilterIcons = Map.fromEntries(
+    transportFilter.entries.expand((entry) => entry.value.map(
+        (filter) => MapEntry(filter, modeIcons[entry.key] ?? Icons.error))));
 
 void main() {
   runApp(const MyApp());
@@ -220,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 30),
-            MyCustomForm(
+            StationSearchForm(
                 onStationChanged: (station) {
                   setState(() {
                     _station = station;
@@ -277,23 +297,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class MyCustomForm extends StatefulWidget {
+class StationSearchForm extends StatefulWidget {
   final ValueChanged<String> onStationChanged;
   final _MyHomePageState? homePageState;
 
-  const MyCustomForm(
+  const StationSearchForm(
       {Key? key, required this.onStationChanged, this.homePageState})
       : super(key: key);
 
   @override
-  _MyCustomFormState createState() => _MyCustomFormState();
+  _StationSearchFormState createState() => _StationSearchFormState();
 }
 
-class _MyCustomFormState extends State<MyCustomForm> {
+class _StationSearchFormState extends State<StationSearchForm> {
   final TextEditingController _stationController = TextEditingController();
   List<dynamic> _possibleStations = [];
   bool _isLoadingLocations = false;
   String _error = '';
+  List<String> _selectedFilters = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (_selectedFilters.isEmpty) {
+      _selectedFilters = transportFilterFlat;
+    }
+  }
 
   Future<List<double>?> _getCurrentLocationCoords() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -414,6 +443,21 @@ class _MyCustomFormState extends State<MyCustomForm> {
     });
   }
 
+  Future<void> _openFilterDialog() async {
+    final selectedFilters = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        return FilterDialog(selectedFilters: _selectedFilters);
+      },
+    );
+
+    if (selectedFilters != null) {
+      setState(() {
+        _selectedFilters = selectedFilters;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -442,8 +486,15 @@ class _MyCustomFormState extends State<MyCustomForm> {
               IconButton(
                 icon: const Icon(Icons.location_on),
                 onPressed: _getClosestStations,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.tertiary,
               ),
+              IconButton(
+                icon: const Icon(Icons.tune),
+                onPressed: _openFilterDialog,
+                color: _selectedFilters.length != transportFilterFlat.length
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.tertiary,
+              )
             ],
           ),
           Center(
@@ -744,6 +795,88 @@ class _ConnectionDetails extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class FilterDialog extends StatefulWidget {
+  final List<String> selectedFilters;
+
+  const FilterDialog({Key? key, required this.selectedFilters})
+      : super(key: key);
+
+  @override
+  _FilterDialogState createState() => _FilterDialogState();
+}
+
+class _FilterDialogState extends State<FilterDialog> {
+  final List<String> _filters = transportFilterFlat;
+  List<String> _selectedFilters = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedFilters = List.from(widget.selectedFilters);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Filter Verbindungen'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: _filters.map((filter) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Icon
+                  Icon(
+                    transportFilterIcons[filter],
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                  const SizedBox(
+                      width: 6), // Adjust spacing between icon and checkbox
+
+                  // Checkbox
+                  Expanded(
+                    child: CheckboxListTile(
+                      dense:
+                          true, // Makes the checkbox smaller to fit alongside the icon
+                      title: Text(filter),
+                      value: _selectedFilters.contains(filter),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            _selectedFilters.add(filter);
+                          } else {
+                            _selectedFilters.remove(filter);
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Abbrechen'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Anwenden'),
+          onPressed: () {
+            Navigator.of(context).pop(_selectedFilters);
+          },
         ),
       ],
     );
