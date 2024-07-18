@@ -17,7 +17,7 @@ Entdecke spontan die Schweiz mit meiner mobilen App! Nutze dein GA oder TagesGA 
 
 Diese mobile App wurde mit [Flutter](https://flutter.dev/), einer plattformübergreifenden, Open-Source-UI-Software, erstellt.
 
-To get the realtime transportation data, the following API is used:
+Um Echtzeit-Transportdaten zu erhalten, wird die folgende API verwendet:
 
 * [Swiss public transport API](http://transport.opendata.ch/) betrieben von [Opendata.ch](https://opendata.ch/)
 
