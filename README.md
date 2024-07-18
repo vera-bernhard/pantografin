@@ -1,11 +1,10 @@
-# Pantografin
+# Pantografin - Deine ÖV-Abenteuer-Begleiterin
 
 <img align="left" width="90" height="90" src="assets/pantografin_logo.png" style="margin-right:10px;">
 
-Embark on a spontaneous Swiss adventure with my mobile app! Utilize your GA or Day pass to the fullest by letting Pantografin choose your mode of transport and your destination. 
-Head to the nearest stop, embrace the randomness, and enjoy the ride. Once leaning back on your train, tram, bus, funicular or ship, let Pantografin decide on the best moment to hop off. 
+Entdecke spontan die Schweiz mit meiner mobilen App! Nutze dein GA oder TagesGA voll aus, indem die Pantografin dein Verkehrsmittel und Ziel auswählt. Gehe zur nächsten Haltestelle, lass dich von der Zufälligkeit überraschen und geniessee die Fahrt. Sobald du dich in deinem Zug, Tram, Bus, Zahnradbähnli oder Schiff zurücklehnst, entscheidet die Pantografin, wann der beste Moment ist, um aus-/umzusteigen. Viel Spass:)
 
-## Some impressions
+## Ein paar Einblicke
 
 <img align="left" width="200" src="assets/screenshot_1.png" style="margin-right:50px;">
 
@@ -16,14 +15,14 @@ Head to the nearest stop, embrace the randomness, and enjoy the ride. Once leani
 
 ## Tech Stack
 
-This mobile app is created with [Flutter](https://flutter.dev/), a cross-platform, open-source UI Software.
+Diese mobile App wurde mit [Flutter](https://flutter.dev/), einer plattformübergreifenden, Open-Source-UI-Software, erstellt.
 
 To get the realtime transportation data, the following API is used:
 
-* [Swiss public transport API](http://transport.opendata.ch/) powered by [Opendata.ch](https://opendata.ch/)
+* [Swiss public transport API](http://transport.opendata.ch/) betrieben von [Opendata.ch](https://opendata.ch/)
 
 ## Comming soon
 
-I am planning to release this app in Google Play Store at some point during this year (2024).
+Ich plane, diese App irgendwann in diesem Jahr (2024) im Google Play Store zu veröffentlichen.
 
-I also want to work on some more features like adding filtering options on the randomly chosen connections, saving the travel history and English language support (the app is currently in German).
+Ich möchte auch ein paar weitere Features wie ein Suchfilter, einen Reiseverlauf sowie eine Englische Übersetzung (das App ist aktuell komplett auf Deutsch) einbauen.
