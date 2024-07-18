@@ -25,4 +25,4 @@ Um Echtzeit-Transportdaten zu erhalten, wird die folgende API verwendet:
 
 Ich plane, diese App irgendwann in diesem Jahr (2024) im Google Play Store zu veröffentlichen.
 
-Ich möchte auch ein paar weitere Features wie ein Suchfilter, einen Reiseverlauf sowie eine Englische Übersetzung (das App ist aktuell komplett auf Deutsch) einbauen.
+Ich möchte auch ein paar weitere Features wie ein Suchfilter, einen Reiseverlauf sowie eine Englische Übersetzung (die App ist aktuell komplett auf Deutsch) einbauen.
