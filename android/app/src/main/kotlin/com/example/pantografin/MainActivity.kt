@@ -1,4 +1,4 @@
-package com.example.sbb_roulette
+package com.example.pantografin
 
 import io.flutter.embedding.android.FlutterActivity
 

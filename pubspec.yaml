@@ -1,4 +1,4 @@
-name: sbb_roulette
+name: pantografin
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -97,5 +97,5 @@ flutter:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/sbb_roulette_circle.png"
+  image_path: "assets/pantografin_logo_cropped.png"
   remove_alpha_ios: true

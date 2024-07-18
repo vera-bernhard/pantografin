@@ -1,6 +1,6 @@
 {
-    "name": "sbb_roulette",
-    "short_name": "sbb_roulette",
+    "name": "pantografin",
+    "short_name": "pantografin",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

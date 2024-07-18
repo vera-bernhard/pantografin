@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "sbb_roulette" "\0"
+            VALUE "FileDescription", "pantografin" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "sbb_roulette" "\0"
+            VALUE "InternalName", "pantografin" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "sbb_roulette.exe" "\0"
-            VALUE "ProductName", "sbb_roulette" "\0"
+            VALUE "OriginalFilename", "pantografin.exe" "\0"
+            VALUE "ProductName", "pantografin" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

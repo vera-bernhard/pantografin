@@ -8,8 +8,12 @@ run-phone:
 	flutter run --device-id 7e62592d
 
 release:
-	flutter build apk
+	flutter build apk --release
 
-install-on-phone:
-	flutter build apk
+install-on-phone: release
 	flutter install --device-id 7e62592d
+
+update-icons:
+	flutter pub get
+	flutter pub run flutter_launcher_icons:main
+	flutter clean

@@ -82,14 +82,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SBB Roulette',
+      title: 'Pantografin',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromRGBO(198, 0, 24, 1.0),
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'SBB Roulette'),
+      home: const MyHomePage(title: 'Pantografin'),
     );
   }
 }
@@ -915,7 +915,7 @@ class _FilterDialogState extends State<FilterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Filter Verbindungen'),
+      title: const Text('Filter Haltestellen & Verbindungen'),
       content: SingleChildScrollView(
         child: ListBody(
           children: _filters.map((filter) {
@@ -970,6 +970,7 @@ class _FilterDialogState extends State<FilterDialog> {
           },
         ),
       ],
+      backgroundColor: Theme.of(context).colorScheme.surface,
     );
   }
 }
