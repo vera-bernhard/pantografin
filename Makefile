@@ -17,3 +17,7 @@ update-icons:
 	flutter pub get
 	flutter pub run flutter_launcher_icons:main
 	flutter clean
+
+# adjust the version number in pubspec.yaml
+update-dep:
+	flutter pub get
