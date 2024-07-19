@@ -2,7 +2,7 @@
 
 <img align="left" width="90" height="90" src="assets/pantografin_logo.png" style="margin-right:10px;">
 
-Entdecke spontan die Schweiz mit meiner mobilen App! Nutze dein GA oder TagesGA voll aus, indem die Pantografin dein Verkehrsmittel und Ziel auswählt. Gehe zur nächsten Haltestelle, lass dich von der Zufälligkeit überraschen und geniessee die Fahrt. Sobald du dich in deinem Zug, Tram, Bus, Zahnradbähnli oder Schiff zurücklehnst, entscheidet die Pantografin, wann der beste Moment ist, um aus-/umzusteigen. Viel Spass:)
+Entdecke spontan die Schweiz mit meiner mobilen App! Nutze dein GA oder TagesGA voll aus, indem die Pantografin dein Verkehrsmittel und Ziel auswählt. Gehe zur nächsten Haltestelle, lass dich von der Zufälligkeit überraschen und geniesse die Fahrt. Sobald du dich in deinem Zug, Tram, Bus, Zahnradbähnli oder Schiff zurücklehnst, entscheidet die Pantografin, wann der beste Moment ist, um aus-/umzusteigen. Viel Spass:)
 
 ## Ein paar Einblicke
 
@@ -25,4 +25,4 @@ Um Echtzeit-Transportdaten zu erhalten, wird die folgende API verwendet:
 
 Ich plane, diese App irgendwann in diesem Jahr (2024) im Google Play Store zu veröffentlichen.
 
-Ich möchte auch ein paar weitere Features wie ein Suchfilter, einen Reiseverlauf sowie eine Englische Übersetzung (das App ist aktuell komplett auf Deutsch) einbauen.
+Ich möchte auch ein paar weitere Features wie ein Suchfilter, einen Reiseverlauf sowie eine Englische Übersetzung (die App ist aktuell komplett auf Deutsch) einbauen.
