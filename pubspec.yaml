@@ -97,5 +97,5 @@ flutter:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/pantografin_logo_cropped.png"
+  image_path: "assets/pantografin_logo_2.0_white.png"
   remove_alpha_ios: true

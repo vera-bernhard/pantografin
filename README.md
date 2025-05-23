@@ -1,6 +1,6 @@
 # Pantografin - Deine ÖV-Abenteuer-Begleiterin
 
-<img align="left" width="90" height="90" src="assets/pantografin_logo.png" style="margin-right:10px;">
+<img align="left" width="90" height="90" src="assets/pantografin_logo_2.0_white.png" style="margin-right:10px;">
 
 Entdecke spontan die Schweiz mit meiner mobilen App! Nutze dein GA oder TagesGA voll aus, indem die Pantografin dein Verkehrsmittel und Ziel auswählt. Gehe zur nächsten Haltestelle, lass dich von der Zufälligkeit überraschen und geniesse die Fahrt. Sobald du dich in deinem Zug, Tram, Bus, Zahnradbähnli oder Schiff zurücklehnst, entscheidet die Pantografin, wann der beste Moment ist, um aus-/umzusteigen. Viel Spass:)
 
